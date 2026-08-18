@@ -157,13 +157,13 @@ This separation allows transaction construction to happen independently from key
 Run the script with Python:
 
 ```bash
-python createPSBT.py
+python bitcoin_psbt_builder.py
 ```
 
 On some systems:
 
 ```bash
-python3 createPSBT.py
+python3 bitcoin_psbt_builder.py
 ```
 
 The program will guide you through the transaction construction process.

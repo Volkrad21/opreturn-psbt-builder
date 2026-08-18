@@ -13,7 +13,6 @@ The script can:
 - Create a change output
 - Add optional `OP_RETURN` data
 - Read `OP_RETURN` data directly from a file
-- Generate arbitrary test payloads
 - Calculate transaction fees using a fee rate in sat/vB
 - Estimate transaction weight and virtual size
 - Calculate the unsigned transaction TXID

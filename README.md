@@ -351,7 +351,6 @@ OP_RETURN input mode:
 
 1 = Enter UTF-8 text
 2 = Read raw bytes from a file
-3 = Generate test payload of exact size
 ```
 
 ## Mode 1 — UTF-8 Text
@@ -414,30 +413,6 @@ Before embedding a file, check it carefully for:
 - other identifying information
 
 Blockchain data should be considered permanent.
-
----
-
-## Mode 3 — Test Payload
-
-Mode 3 generates an exact number of bytes:
-
-```text
-OP_RETURN input mode:
-> 3
-
-Test payload size in bytes:
-> 10000
-```
-
-The script generates:
-
-```python
-b"A" * 10000
-```
-
-This creates exactly 10,000 bytes of test data.
-
-This mode is useful for investigating wallet, mempool, relay, and transaction-size behavior without creating separate test files.
 
 ---
 

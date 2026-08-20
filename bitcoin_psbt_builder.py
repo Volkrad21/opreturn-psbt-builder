@@ -10,6 +10,11 @@ from decimal import Decimal, ROUND_CEILING
 
 MAX_STANDARD_TX_WEIGHT = 400_000
 
+# Bitcoin Core's default dust relay fee is 3,000 sat/kvB. This is
+# intentionally separate from the user-selected transaction fee rate:
+# it is used only to avoid creating an uneconomical change output.
+DEFAULT_DUST_RELAY_FEE = 3_000
+
 # Bitcoin Core 30+ default datacarrier size.
 # Node policy can be configured differently.
 DEFAULT_DATACARRIER_LIMIT = 100_000
@@ -786,6 +791,31 @@ def calculate_fee(
     )
 
 
+def calculate_witness_dust_threshold(
+    script,
+    dust_relay_fee=DEFAULT_DUST_RELAY_FEE
+):
+    if dust_relay_fee < 0:
+        raise ValueError(
+            "Dust relay fee cannot be negative."
+        )
+
+    # Bitcoin Core estimates a witness output's future spending input
+    # as 32-byte txid + 4-byte vout + 1-byte scriptSig length +
+    # discounted 107-byte witness + 4-byte sequence = 67 bytes.
+    output_size = len(
+        serialize_output(0, script)
+    )
+
+    spend_size = 67
+
+    return (
+        (output_size + spend_size)
+        * dust_relay_fee
+        + 999
+    ) // 1_000
+
+
 # ============================================================
 # START
 # ============================================================
@@ -1255,6 +1285,23 @@ if change_amount <= 0:
     )
 
 
+change_dust_threshold = \
+    calculate_witness_dust_threshold(
+        change_script
+    )
+
+
+if change_amount < change_dust_threshold:
+
+    raise ValueError(
+        "\nThe calculated change output is dust and would "
+        "normally be rejected by Bitcoin nodes.\n\n"
+        f"Change amount:  {change_amount} sats\n"
+        f"Dust threshold: {change_dust_threshold} sats\n\n"
+        "Reduce the payment amount or use a lower fee rate."
+    )
+
+
 # ============================================================
 # BUILD FINAL OUTPUTS
 # ============================================================
@@ -1661,3 +1708,4 @@ print(
 )
 
 print()
+
